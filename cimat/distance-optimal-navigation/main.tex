@@ -1,0 +1,377 @@
+\documentclass{beamer}
+\input{setup.tex}
+
+% Definir color
+\definecolor{beamer_color}{RGB}{115,36,61} 
+\definecolor{backframe_color}{RGB}{248, 248, 255}
+
+\newcommand{\descmath}[1]{%
+  \begingroup\color{beamer_color}\(#1\)\endgroup
+}
+
+\begin{document}
+
+\begin{frame}
+    \maketitle
+    \centering
+    \cite{tovar2007distanceoptimal}
+\end{frame}
+
+\begin{frame}{Contents}
+    \tableofcontents
+\end{frame}
+
+\section{Sections of the Paper}
+
+\subsection{Introduction \& Previous Work}
+
+% --- Slide 1: Mini-Glossary (The Reference) ---
+\begin{frame}{Mini-Glossary: Foundation Concepts}
+    \begin{description}[labelwidth=-0.8cm]
+        \item[Gap] A "Depth Discontinuity" – an obstacle or a corner that hides part of the environment.    
+        \item[Metric Map] A "Blueprint" – knows exact lengths and angles.
+        \item[Homotopy Class] An equivalence class of paths that can be continuously deformed into one another while keeping their endpoints fixed.
+        \item[Topological Map] A "Subway Map" – knows how regions are connected, but not distances.
+        \item[Simply Connected] A room with no pillars or holes (one continuous boundary).
+        \item[ Information Space] Focuses on the information state ($\eta$), which is the history of all sensor readings and actions taken by the robot up to that point \cite{lavalle2006planning}.
+        \item[Euclidean Optimality] The absolute shortest path between two points.
+    \end{description}
+\end{frame}
+
+% --- Slide 2: The Hook ---
+\begin{frame}{The Minimalist Challenge}
+    \begin{tcolorbox}[colback=backframe_color,colframe=beamer_color,title=The Research Question]
+        What is the minimal information required for a robot to navigate optimally?
+    \end{tcolorbox}
+    \vfill
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Traditional Navigation}
+            \begin{itemize}
+                \item Requires exact $(x, y)$
+                \item Measures distances/angles
+                \item Needs high-power sensors (LiDAR/GPS)
+                \item \textit{"More data is better"}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{This Paper's Approach}
+            \begin{itemize}
+                \item No coordinates/compass
+                \item No distance measurements
+                \item Minimalist sensing
+                \item \textit{"Information is the key"}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    \vspace{\baselineskip}
+    Can a robot achieve \textbf{Euclidean Optimality} using only the sequence of \textbf{Gaps} it sees, without ever measuring a single distance?
+\end{frame}
+
+% --- Slide 3: Section I - The Information Paradox ---
+\begin{frame}{Section I: Introduction}
+    \vspace{-\baselineskip}
+    \begin{tcolorbox}[colback=backframe_color,colframe=beamer_color,title=What are the assumptions?]
+    Model the robot as a point moving in a \textbf{simply connected}* unknown planar environment. The robot has a gap sensor.
+    \end{tcolorbox}
+    \begin{columns}[c] % c = vertically centered
+      \column{0.3\textwidth}
+        \includegraphics[width=\linewidth]{figures/figure1_environments.png}
+      \column{0.4\textwidth}
+        \scriptsize{Fig. 1. (a)–(e) Environments which are indistinguishable to the robot (black disc) with limited sensing; however, it can still navigate optimally using the GNT shown in (f).}
+    \end{columns}
+    To characterize its environment, the robot builds a dynamic data structure, called the \textbf{Gap Navigation Tree (GNT)}, and is updated to mantain shortest-path information from the current position of the robot. 
+    
+    \vspace{\baselineskip}
+    \scriptsize{*Multiply connected environments are adressed in a following section.}
+\end{frame}
+
+% --- Slide 4: Section II - Previous Work ---
+\begin{frame}{Section II: Previous Work}
+    The GNT is a \textbf{topological map} approach that bridges the gap between traditional approaches (achieving Euclidean optimality with minimalist sensors):
+    \vspace{0.3cm}
+    \begin{itemize}
+        \item \textbf{Grid-Based Maps:} Discretize space into regular grids; high computational and memory burden.
+        \item \textbf{Exact Geometric Representations:} Use precise coordinates/polygons; require \textbf{exact localisation} and perfect sensing.
+        \item \textbf{Bug Algorithms:} Uses local information for constant-memory navigation but results in inefficient \textbf{non-optimal} paths.
+    \end{itemize}
+    \vspace{0.3cm}
+    \begin{table}[]
+        \footnotesize
+        \centering
+        \begin{tabular}{|l|l|l|}
+        \hline
+        \textbf{Representation} & \textbf{Sensing Level} & \textbf{Distance Optimality} \\ \hline
+        Grid / Geometric & Dense / Metric & Excellent (Global) \\ \hline
+        Bug Algorithms & Minimalist & Poor \\ \hline
+        \rowcolor[gray]{0.9} \textbf{GNT (Proposed)} & \textbf{Minimalist} & \textbf{Optimal*} \\ \hline
+        \end{tabular}
+    \end{table}
+    \scriptsize{*With limited sensing, global optimality is impossible; GNT achieves local optimality within a \textbf{homotopy class}.}
+\end{frame}
+
+% --- Slide 5 --- Section II:  Visibility and Minimalism ---
+\begin{frame}{Visibility \& Minimalism}
+    \begin{itemize}
+        \item \textbf{Minimalist Sensing Philosophy:}
+        One can imagine an abstract sensor providing minimal ideal information, physically implemented by a subideal sensor.
+        \item \textbf{The Visibility Region ($V(x)$):}
+        The core foundation of this work. It stems from famous problems like:
+        \begin{itemize}
+            \item \textbf{Art-Gallery Problem:} How many cameras/guards are needed to see an entire room?
+            \item \textbf{Aspect Graphs:} Groups together all viewpoints that see the same "combinatorial structure" of an object.
+        \end{itemize}
+        \item \textbf{Visual Events:} 
+        A term used to describe the \textit{exact moment} the Visibility Region changes (crossing a "Visibility Cell" boundary). Our GNT is built entirely on these events.
+        \item \textbf{Prior Data Structures:}
+        A similar structure to the GNT exists in previous work \cite{aronov1998visibility}, but with a \textbf{critical difference}:
+        \begin{itemize}
+            \item \textbf{Previous Work:} Assumed \textit{perfect knowledge} of the map and \textit{exact localization}.
+            \item \textbf{This Paper:} Assumes \textbf{unknown environments} and \textbf{no localization}.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\subsection{Robot Model}
+
+% --- Mini-Glossary for Section III ---
+\begin{frame}{Mini-Glossary: Section III Notation}
+    \begin{description}[labelwidth=-0.8cm]
+        \item[\descmath{R,\, \partial R}] The environment and its boundary (the walls).
+        \item[\descmath{G(x)}] The \textbf{Gap Sequence} observed at position $x$.
+        \item[\descmath{[g_1, \dots, g_k]}] Brackets and ellipsis denote a \textbf{Cyclic Order}
+        \item[\descmath{\mathrm{chase}(g)}] The \textbf{Motion Primitive} (Align $\rightarrow$ Move $\rightarrow$ Feedback).        
+        \item[\descmath{\tau : [0, 1] \to R}] \textbf{Path}: The robot's movement over \textit{space} (normalized geometry). 
+        \item[\descmath{\tau : [0, t_f] \to R}] \textbf{Trajectory}: The robot's movement over \textit{time} ($t_f$ is final time).
+    \end{description}
+    \vfill
+    \footnotesize \textit{Note: Since the robot moves at \textbf{unit speed}, time and distance are equivalent, allowing $\tau$ to represent both trajectory and path.}
+\end{frame}
+
+% --- Slide 5: Transition to the Model ---
+\begin{frame}{Section III: The Robot Model}
+    \textbf{The Point Robot:}
+    \begin{itemize}
+        \item No Coordinates $(x, y)$
+        \item No Compass / Orientation
+        \item No Odometer (doesn't know how far it moves)
+    \end{itemize}
+    \vspace{0.3cm}
+    \textbf{The Environment ($R$):}
+    \begin{itemize}
+        \item Unknown planar world.
+        \item Boundary ($\partial R$) is "piecewise-analytic" (smooth curves + corners).
+    \end{itemize}
+    \vspace{0.3cm}
+    \textbf{The Strategy:}
+    Build a data structure purely from \textbf{Visual Events} (Gaps appearing, merging, or splitting).
+\end{frame}
+
+% --- Slide: The Gap Sensor (Logic) ---
+\begin{frame}{3A. The Gap Sensor}
+    \begin{itemize}
+        \item \textbf{The Core Function:} Detects "breaks" in the boundary $\partial R$ where depth is discontinuous.
+        \item \textbf{Identity Tracking:} The robot maintains a unique label for each gap $g_i$ as long as it remains visible.
+        \item \textbf{Output $G(x) = [g_1, \dots, g_k]$:}
+        \begin{itemize}
+            \item Reports the \textbf{order} of gaps, not their distance or angle.
+            \item Since it is cyclic, $[g_1, g_2, g_3] = [g_2, g_3, g_1]$.
+        \end{itemize}
+    \end{itemize}
+    \vspace{\baselineskip}
+    \begin{block}{The "Correspondence" Assumption}
+        The robot is fast enough to "watch" gaps move; it never loses track of which label belongs to which physical corner.
+    \end{block}
+\end{frame}
+
+% --- Slide: The Gap Sensor (Visuals) ---
+\begin{frame}{Visualizing the Sensor}
+    \vspace{-\baselineskip}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+            \includegraphics[width=\linewidth]{figures/figure2_visibility.png}
+               \scriptsize{Fig. 2. Robot’s view of the environment}
+            \end{center}
+            \small
+            \begin{itemize}
+                \item \textbf{On the left:} The Visibility Region $V(x)$ in $R$.
+                \item \textbf{On the right:} The abstract representation $G(x)$.
+                \item The 2D world is reduced to a 1D sequence.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+        \includegraphics[width=\linewidth]{figures/figure3_tangent.png}
+               \scriptsize{Fig. 3. Gaps from the environment’s boundary.}
+            \end{center}
+            \small
+            \begin{itemize}
+                \item Works for smooth curves (\textbf{3a}) and sharp corners (\textbf{3b}).
+                \item A gap exists wherever the robot's line of sight "grazes" $\partial R$.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide: Motion Primitives ---
+\begin{frame}{3B. Motion Primitives}
+    \begin{itemize}
+        \item {The robot motions are expressed as a sequence of \textbf{motion primitives}, which are described solely in terms of information from the sensor.}
+        \item {A gap chasing motion primitive is denoted as chase(g)}
+    \end{itemize}
+    \vspace{\baselineskip}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \footnotesize {Execution of chase(g):}
+            \begin{enumerate}
+                \item Align heading with gap $g$.
+                \item Move forward at \textbf{unit speed}.
+                \item Use \textbf{feedback} to adjust heading as $g$ shifts.
+            \end{enumerate}
+            \vspace{0.3cm}
+			\footnotesize{The robot navigation capabilities are simple:}
+            \begin{itemize}
+                \item {Movement towards boundary components $\&$ wall-following.}
+                \item {The chase$(g)$ terminates when $g$ disappears from $G(\tau(t))$.}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \includegraphics[width=\linewidth]{figures/figure4_chase.png}
+                \scriptsize{Fig. 4. The chase($\cdot$) motion primitive.}
+            \end{center}
+            \footnotesize
+            The path $\tau$ isn't always a straight line; the robot "slides" along boundaries to stay locked on $g$.
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\subsection{Gap Navigation Tree}
+
+% --- Slide: The Three Notations of Chase ---
+%\begin{frame}{Defining the "Chase" Actions}
+%    The paper uses three specific notations to describe movement:
+%    \vspace{0.4cm}
+%    \begin{itemize}
+%        \item $\text{chase}(g)$: A \textit{single} motion primitive targeting a visible gap $g$.
+%        \item \textbf{$\mathbf{chase}(g)$ (Bold):} A \textit{sequence} of primitives. Used to reach a gap $g$ hidden deep in the tree by chasing its ancestors first.
+%        \item $\text{chase}(\cdot)$: Refers to the \textit{abstract concept} or class of motion primitives regardless of the specific gap.
+%    \end{itemize}
+%\end{frame}
+
+% --- Slide: IV.A Compressing Sensor History ---
+\begin{frame}{Section IV.A: GNT Structure \& Vertices}
+    \begin{itemize}
+        \item \textbf{Rooted Tree:} Compresses the history of $G(\tau(s))$. The root is the robot's current position.
+        \item \textbf{Vertex Classification:}
+        \begin{itemize}
+            \item \textbf{Primitive:} A leaf that disappears when chased (no hidden regions).
+            \item \textbf{Non-Primitive:} A leaf that splits when chased (hides other gaps).
+        \end{itemize}
+        \item \textbf{Complete GNT:} 
+        \begin{block}{}
+            A GNT is \textbf{Complete} if and only if all of its leaf vertices are \textbf{primitive}.
+        \end{block}
+        \item \textit{Insight:} A complete tree means the robot has explored every hidden "nook" in the environment.
+    \end{itemize}
+\end{frame}
+
+% --- Mini-Glossary for Section IV ---
+\begin{frame}{Mini-Glossary: GNT Formalism}
+	\begin{description}[labelwidth=-0.8cm]
+		\item[\descmath{s \in [0, 1]}] Normalizes the path $\tau(s)$ from start to end.
+		\item[\descmath{I, J}] Connected segments of the boundary $\partial R$.
+		\item[\descmath{L}] A line that partitions space or acts as a tangent.
+		\item[{Gen. Inflection}] Where boundary $I$ crosses its tangent line $L$.
+		\item[{Gen. Bitangent}] A line $L$ tangent to two disjoint segments $I$ and $J$.
+	\end{description}
+\end{frame}
+
+
+% --- Slide: IV.B & C Critical Events & Geometry ---
+\begin{frame}{IV.B \& C: Critical Events \& Geometric Triggers}
+    \begin{columns}[T]
+        \begin{column}{0.6\textwidth}
+            \small
+            \textbf{The Four Events (Fig 5):}
+            \begin{enumerate}
+                \item \textbf{Appearance:} New gap $g$ added to root.
+                \item \textbf{Merge:} $g_1, g_2$ become children of a new vertex.
+                \item \textbf{Disappearance:} Primitive leaf is removed.
+                \item \textbf{Split:} Non-primitive vertex divides.
+            \end{enumerate}
+            \vspace{0.2cm}
+            \textbf{Geometric Relations (Fig 6):}
+            \begin{itemize}
+                \item \textbf{Inflections:} Line $L$ partitions $I$ into $I_1, I_2$. Triggers Appearance/Disappearance.
+                \item \textbf{Bitangents:} Line $L$ is tangent to disjoint $I$ and $J$. Triggers Merge/Split.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \begin{center}
+                \textit{[Insert Figure 5 \& 6]}
+            \end{center}
+            \footnotesize
+            \textbf{Lemma 1:} Merged gaps $g_1, g_2$ always reappear at the same angle when their parent splits.
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide: IV.D The Gap-Based Roadmap ---
+\begin{frame}{Section IV.D: The Gap-Based Roadmap ($S$)}
+    \begin{itemize}
+        \item \textbf{Definition:} $S$ is the set of all points reached by executing a sequence of $\text{chase}(\cdot)$ primitives following critical events.
+        \item \textbf{Function:} It serves as a topological "skeleton" of the environment.
+        \item \textbf{Termination (Lemma 2):} Every $\text{chase}(g)$ is guaranteed to terminate because the robot must eventually cross an inflection or bitangent.
+    \end{itemize}
+    \vfill
+    \begin{center}
+        \textit{$S$ contains all information needed for distance-optimal navigation.}
+    \end{center}
+\end{frame}
+
+% --- Slide: IV.E Constructing a Complete GNT ---
+\begin{frame}{Section IV.E: Exploration Strategy}
+    \begin{columns}[T]
+        \begin{column}{0.6\textwidth}
+            \textbf{The Algorithm:}
+            \begin{enumerate}
+                \item Identify a non-primitive leaf vertex $g$.
+                \item Execute $\mathbf{chase}(g)$.
+                \item Update tree based on splits or disappearances.
+                \item Repeat until all leaves are primitive.
+            \end{enumerate}
+            \vspace{0.3cm}
+            \textbf{Lemma 3:} 
+            This process is guaranteed to finish because $\partial R$ has a finite number of inflection and bitangent triggers.
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \begin{center}
+                \textit{[Insert Figure 8]} \\
+                \footnotesize \textbf{Figure 8: Incremental construction of the GNT.}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\subsection{Optimal Navigation}
+
+\subsection{Multiply Connected Environments}
+
+\subsection{Implementation}
+
+\subsection{Conclusions \& Discussion}
+
+\section{References}
+
+\begin{frame}[allowframebreaks]{References}
+\bibliographystyle{ieeetr}
+\bibliography{biblio}
+\end{frame}
+
+\begin{frame}
+    \maketitle
+\end{frame}
+
+\end{document}

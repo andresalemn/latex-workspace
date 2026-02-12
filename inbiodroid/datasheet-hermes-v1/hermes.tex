@@ -1,0 +1,190 @@
+\documentclass[a4paper,12pt,oneside,pdflatex,italian,final,twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{parallel}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage[export]{adjustbox}
+\usepackage[top=1.0in,bottom=0.8in,left=0.7in,right=0.7in]{geometry}
+\usepackage{libertine}
+\renewcommand*\familydefault{\sfdefault} 
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+
+\title{HERMES MODULE}
+\author{Inbiodroid}
+\date{August 2025}
+
+\begin{document}
+
+% --- Cover Page ---
+\begin{titlepage}
+    \centering
+    \vspace*{2.5cm}
+
+    \includegraphics[width=0.4\textwidth]{figures/logo.png}\par
+    \vspace{1cm}
+
+    {\Huge \textbf{HERMES MODULE}}\par
+    \vspace{0.5cm}
+    {\LARGE Inbiodroid}\par
+    \vspace{0.5cm}
+
+    % Insert additional image here
+    \includegraphics[width=0.4\textwidth]{figures/hermesCAD.png}\par
+    \vspace{0.5cm}
+
+    {\Large \textbf{Versión: v1.0}}\par
+    \vspace{0.5cm}
+    {\large Agosto de 2025}\par
+    \vfill
+
+    {\large Hoja Técnica}\par
+\end{titlepage}
+
+% --- Start of main content ---
+\pagestyle{fancy}
+\lhead{Inbiodroid}
+\rhead{HERMES MODULE v1.0}
+\fancyfoot[C]{\thepage}
+
+\onecolumn
+
+% --- Header Figure ---
+\begin{figure}[h!]
+\begin{minipage}{0.4\textwidth}
+\centering
+\includegraphics[width=.8\textwidth,center]{figures/logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+\centering
+\Huge \textbf{HERMES v1.0}
+\end{minipage}
+\end{figure}
+
+% --- Resumen Section ---
+\begin{figure}[h!]
+\begin{minipage}{0.47\textwidth}
+\section{Resumen}
+\begin{itemize}
+    \item Módulo para Captura de Movimiento
+    \item Retroalimentación Háptica (Vibrador)
+    \item Procesamiento de Sensores (9-DOF IMU)
+    \item Comunicación Inalámbrica (ESP-32)
+    \item +4 horas en Operación
+\end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}{0.47\textwidth}
+\centering
+\includegraphics[width=0.7\textwidth,right]{figures/hermesCAD.png}
+\end{minipage}
+\end{figure}
+
+% --- Rest of the document ---
+\vspace{-2em}
+\section{Descripción General}
+\begin{itemize}
+\item El módulo Hermes forma parte del sistema de telepresencia Prometheus 3.0, capaz de teleoperar un robot humanoide de 20 DOF. 
+\item Mediante una cadena de estos módulos colocados en el tren superior de una persona, Hermes está diseñado para capturar sus movimientos en tiempo real.
+\item Arquitectura de Dispositivos Maestro - Esclavos: Se compone de dos tipos de unidades:
+    \begin{itemize}
+    \item Unidad `Stella` (Orquestador Central): Es la unidad principal del sistema, que se lleva en el pecho del operador. Recibe y centraliza los datos de todas las unidades Satelle.
+    \item Unidades `Satelle` (Recolectores de Datos): Se colocan en las extremidades del operador (hombros, codos y muñecas).
+    \end{itemize}
+\end{itemize}
+
+\vspace{-1.5em}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{figures/hermesChain.png}
+\end{center}
+\vspace{-2em}
+
+\section{Funcionamiento}
+\begin{itemize}
+ \item Comunicación:
+ \begin{itemize}
+    \item Cada Satelle lee su sensor IMU para determinar su orientación 3D (Cuaternión).
+    \item Los datos de cada Satelle se envían de forma inalámbrica a la unidad Stella (paquetes UDP).
+    \item La unidad Stella calcula la pose cartesiana (posición y rotación) deseada para el efector final de los brazos y además calcula las rotaciones del torso del robot humanoide.
+ \end{itemize}
+\end{itemize}
+
+\vspace{-1em}
+
+%\begin{center}
+\begin{minipage}{0.65\textwidth}
+\begin{itemize}
+    \item Captura del movimiento para los brazos:
+    \begin{itemize}
+    \item Para cada brazo se utilizan tres módulos Satelle.
+    \item Los primeros dos (hombro y codo) se emplean para determinar la posición cartesiana deseada en el efector final $P_\text{final}$.
+    \item El tercer módulo (muñeca) se utiliza para calcular la orientación del efector final $R_{final}$.
+    \item La pose cartesiana se compone de $ \begin{bmatrix} P_{final} & R_{final}\end{bmatrix}$
+    \item[] $Pose_\text{} =\begin{bmatrix} x_{P} & y_{P} & z_{P} & w_{R} & x_{R} & y_{R} & z_{R}\end{bmatrix}$.
+    \end{itemize}
+ \end{itemize}
+\end{minipage}%
+\begin{minipage}{0.25\textwidth}
+\includegraphics[width=\linewidth]{figures/cal.png}
+\end{minipage}
+%\end{center}
+\begin{itemize}
+    \item Captura del movimiento para el torso:
+    \vspace{-0.5em}
+    \begin{itemize}
+    \item Stella el módulo encargado de generar las rotaciones para el torso del robot Prometheus por medio de ángulos de euler.
+    \item Una vez calibrado, Stella genera los movimientos son de Yaw (rotación de izquierda a derecha) y Pitch (inclinación hacia adelante o hacia atrás).
+    \end{itemize}
+\end{itemize}
+
+\section{Especificaciones Técnicas}
+\centering
+\begin{tabular}{ccc}
+\toprule
+ & Valor & Unidad \\
+\midrule
+Peso & 75 & $g$ \\
+Dimensiones & 65*58*34 & $mm*mm*mm$ \\
+n° de entradas & 2 & $--$ \\
+Grados de Libertad & 9 & $DOF$ \\
+Alimentación del Módulo & 5 & $V$ \\
+Corriente mínima de Carga & 2 & $A$ \\
+Temperatura de Operación & 15 - 40 & $C$ \\
+
+\bottomrule
+\end{tabular}
+
+\raggedright
+
+\section{Interfaz}
+\begin{center}
+\begin{minipage}{0.5\textwidth}
+\centering
+\begin{tabular}{lcr}
+\toprule
+Núm & Interfaz \\
+\midrule
+1 & Puerto C (Power 5V)  \\
+2 & Puerto Jack (Periféricos)  \\
+3 & Botón (Calibración y Batería)   \\
+4 & Switch de Encendido y Apagado  \\
+5 & LED de Estados (Multiusos) \\
+\bottomrule
+\end{tabular}
+\end{minipage}%
+\begin{minipage}{0.45\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/hermesNumbers.png}
+\end{minipage}
+\end{center}
+
+\section{Medidas}
+\centering
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{figures/measures.png}
+\end{figure}
+
+\end{document}

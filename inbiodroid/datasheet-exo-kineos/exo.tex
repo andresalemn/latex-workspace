@@ -1,0 +1,198 @@
+\documentclass[a4paper,12pt,oneside,pdflatex,italian,final,twocolumn]{article}
+
+\usepackage{caption}
+\usepackage[labelformat=empty]{caption}
+\usepackage[utf8]{inputenc}
+\usepackage{parallel}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage[export]{adjustbox}
+\usepackage[top=1.0in,bottom=0.8in,left=0.7in,right=0.7in]{geometry}
+\usepackage{libertine}
+\renewcommand*\familydefault{\sfdefault} 
+\usepackage[T1]{fontenc}
+
+\title{Exo-Kineos HS&EK v1.0}
+\author{Inbiodroid}
+\date{August 2025}
+
+\begin{document}
+
+% --- Cover Page ---
+\begin{titlepage}
+    \centering
+    \vspace*{2.5cm}
+
+    \includegraphics[width=0.4\textwidth]{figures/logo.png}\par
+    \vspace{1cm}
+
+    {\Huge \textbf{EXO-KINEOS}}\par
+    \vspace{0.5cm}
+    {\LARGE Inbiodroid}\par
+    \vspace{0.5cm}
+
+    % Insert additional image here
+    \includegraphics[width=0.5\textwidth]{figures/frontPage.png}\par
+    \vspace{0.5cm}
+
+    {\Large \textbf{Versión: v1.0}}\par
+    \vspace{0.5cm}
+    {\large Agosto de 2025}\par
+    \vfill
+
+    {\large Hoja Técnica}\par
+\end{titlepage}
+
+% --- Start of main content ---
+\pagestyle{fancy}
+\lhead{Inbiodroid}
+\rhead{EXO-KINEOS v1.0}
+\fancyfoot[C]{\thepage}
+
+\onecolumn
+
+% --- Header Figure ---
+\begin{figure}[h!]
+\begin{minipage}{0.4\textwidth}
+\centering
+\includegraphics[width=.8\textwidth,center]{figures/logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+\centering
+\Huge \textbf{EXO-KINEOS v1.0}
+\end{minipage}
+\end{figure}
+
+% --- Resumen Section ---
+\begin{figure}[h!]
+\begin{minipage}{0.47\textwidth}
+\section{Resumen}
+\begin{itemize}
+    \item +4 horas en Operación
+    \item Herramienta de Monitoreo
+    \item Electrodos y sensores EMG
+    \item Actividad muscular y Movimiento Articular
+    \item Aplicación de Escritorio para Monitoreo
+\end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}{0.47\textwidth}
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/exo.png}
+    \captionof{figure}{Módulo de Control del Exo-Kineos}
+\end{minipage}
+\end{figure}
+
+% --- Rest of the document ---
+\vspace{-2em}
+\section{Descripción General}
+\begin{itemize}
+\item El Exo-Kineos es un sistema biomecatrónico (exoesqueleto) de evaluación y análisis muscular diseñado para medir el esfuerzo muscular (actividad EMG) y la cinemática del movimiento (posición y velocidad articular) en tiempo real.
+\item Exo-Kineos EK: Evaluación muscular para la articulación del codo (brazo-antebrazo) o la rodilla (pierna).
+\item Exo-Kineos HS: Análisis muscular para la articulación compleja del hombro o la cadera.
+\end{itemize}
+
+\vspace{-0.5em}
+
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{%
+    \begin{minipage}{0.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/EK.png}
+        \captionof{figure}{Exo-Kineos EK}
+    \end{minipage}
+    \hspace{0.1\textwidth}  % space between images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/HS.png}
+        \captionof{figure}{Exo-Kineos HS}
+    \end{minipage}
+}
+\end{figure}
+
+
+\vspace{-1em}
+
+\section{Funcionamiento}
+\begin{itemize}
+ \item Principios de Funcionamiento:
+ \begin{itemize}
+    \item Electromiografía (EMG): Mide el potencial eléctrico de los músculos (actividad muscular) mediante sensores de superficie MyoWare 2.0.
+    \item Cinemática: Cuantifica el posición y la velocidad del movimiento articular mediante encoders de alta precisión integrados en los eslabones del exoesqueleto.
+
+ \end{itemize}
+\end{itemize}
+
+\section{Datos Técnicos}
+\centering
+\begin{tabular}{ccc}
+\toprule
+ Categoria & Dato \\
+\midrule
+Peso & 2.5kg entre ambos dispositivos \\
+Carga & USB-C \\
+Sensores & MyoWare 2.0 Muscle Sensor \\
+Materiales & Nylon PA12, Aluminio, PLA y bandas textiles \\
+Conectividad & Bluetooth \\
+Salida de Datos & Archivo CSV para su posterior análisis \\
+Tasa de Muestreo & Variable de 0 a 500Hz en pasos de 100 Hz \\
+Interfaz de Datos & Aplicación de escritorio "Exo-View" \\
+Precisión del Encoder & 14 bits \\
+Resolución de la Señal EMG & 12 bits \\
+\bottomrule
+\end{tabular}
+
+\raggedright
+\section{Alimentación y Batería}
+\centering
+\begin{tabular}{ccc}
+\toprule
+ & Valor & Unidad \\
+\midrule
+Tiempo de Carga & 1.5 & $horas$ \\
+Capacidad de la Batería & 3.7 & $V$ \\
+Alimentación del Módulo & 5 & $V$ \\
+Capacidad de la Batería & 1500 & $mAh$ \\
+Vida útil de la batería & 2 & $years$ \\
+Autonomía (uso Continuo) & 4 & $horas$ \\
+Corriente mínima de Carga & 1 & $A$ \\
+\bottomrule
+\end{tabular}
+
+\raggedright
+
+\section{Aplicacion de Escritorio}
+\begin{itemize}
+\item Kineos-View
+    \begin{itemize}
+        \item Tipo: Aplicación de escritorio para Windows (archivo .exe).
+        \item Funcionalidad: Visualización en tiempo real de gráficas de Posición Angular, Velocidad Angular y señales EMG en bruto. Almacenamiento de datos.
+        \item Gráficas por Modelo:
+        \begin{itemize}
+            \item Exo-Kineos EK (Codo/Rodilla): 4 gráficas (1 Posición, 1 Velocidad, 2 EMG).
+            \item Exo-Kineos HS (Hombro/Cadera): 9 gráficas (3 Posición, 3 Velocidad, 3 EMG).
+        \end{itemize}
+
+    \end{itemize}
+\end{itemize}
+\begin{figure}[h!]
+\centering
+\vspace{-1em}
+\includegraphics[width=0.5\linewidth]{figures/view.png}
+\vspace{-1em}
+\end{figure}
+
+\raggedright
+\section{Dimensiones}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{figures/HS_measures.png}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{figures/EK_measures.png}
+\end{figure}
+\end{document}

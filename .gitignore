@@ -1,0 +1,22 @@
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.run.xml
+
+# Build directories (if you use latexmk -outdir)
+build/
+
+# Optional: PDF output
+# Uncomment if you do NOT want PDFs tracked
+*.pdf

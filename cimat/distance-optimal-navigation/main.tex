@@ -399,8 +399,9 @@
             \end{enumerate}
             \vspace{0.3cm}
             \textbf{Lemma 3:} The procedure of iteratively chasing nonprimitive leaves terminates with a resulting complete GNT.\\
-           	\vspace{\baselineskip}
- 			\scriptsize{Fig. 8. Building the GNT. (a) The thin lines show the places where gap critical events are triggered. The robot chases nonprimitive gaps from (a) to (f), updating the GNT accordingly (refer to the text), until all of the leaf vertices are primitive. Squares and circles denote primitive and nonprimitive vertices, respectively.}
+           	\begin{center}
+	 			\scriptsize{Fig. 8. Building the GNT. (a) The thin lines show the places where gap critical events are triggered. The robot chases nonprimitive gaps from (a) to (f), updating the GNT accordingly (refer to the text), until all of the leaf vertices are primitive. Squares and circles denote primitive and nonprimitive vertices, respectively.}
+		 	\end{center}
         \end{column}
         \begin{column}{0.35\textwidth}
        		\vspace{-\baselineskip}
@@ -496,8 +497,213 @@
 \end{frame}
 
 \subsection{Multiply Connected Environments}
+
+% --- Mini-Glossary for Section VI ---
+\begin{frame}{Mini-Glossary:  MCE}
+	\begin{description}[labelwidth=-0.8cm] 
+		\item[Multiply Connected] An environment containing disjoint obstacles (islands or pillars). 
+		\item[Homotopy Class] An equivalence class of paths that can be continuously deformed into one another while keeping their endpoints fixed.
+		\item[Local Optimality] The shortest path within a specific \textit{homotopy class}.
+		\item[$b$] Boundary Component. A specific, disjoint obstacle (pillar) or the outer wall.
+		\item[surround$(b)$] \textbf{Primitive:} Move around boundary $b$ until the start is reached.
+		\item[Block Vertex]  A leaf in the tree that represents an unexplored path around a boundary component. It acts as a "placeholder" until the robot surrounds that pillar.
+	\end{description}
+\end{frame}
+
+% --- Slide: The Failure of the Basic GNT ---
+\begin{frame}{Section VI: MCE}
+	In rooms with pillars, the basic model faces two critical failures:
+	\vspace{0.3cm}
+	\begin{columns}[T]
+		\begin{column}{0.5\textwidth}
+			\small
+			\textbf{Theorem 3:} Termination of gap-chasing motion primitives is not guaranteed in multiply connected environments.
+			\begin{center}
+		    	\includegraphics[width=0.8\linewidth]{figures/figure10_gaps_multiply.png}\\
+				\scriptsize{Fig. 10. Gaps in a multiply connected environment may not disappear. (a) The robot will chase any of the two gaps shown, and none of them will disappear. (b) Using only the gap sensor, the spiral looks the same as the disc in (a).}
+			\end{center}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\small
+			\textbf{Theorem 4:} Global path optimality is in general not possible using only gap sensing.\\
+			\vspace{\baselineskip}
+	    	\includegraphics[width=\linewidth]{figures/figure11_global_optimality.png}
+			\scriptsize{Fig. 11. (a) Global optimal navigation is not guaranteed in multiply connected environments. Paths with the least number of gaps are preferred. b) A worst case navigation example. If $b \gg a$, and if the robot chooses to follow the gap on the right, then almost the whole triangle boundary will be followed to reach the circle.}
+		\end{column}
+	\end{columns}
+	\vfill
+	\begin{center}
+		\textit{Solution: The robot finds the \textbf{Locally Optimal} path in its chosen direction.}
+	\end{center}
+\end{frame}
+
+% --- Slide: VI.A New Assumptions (Pebbles) ---
+\begin{frame}{Section VI.A: New Assumptions for MCE}
+	To solve infinite loops, the robot is given an abstract tool: \textbf{Pebbles}.
+	\vspace{0.3cm}
+	\begin{columns}[T]
+			\begin{column}{0.6\textwidth}
+					\begin{itemize}
+							\item \textbf{Pebble/Marker:} Dropped when the robot first touches a boundary.
+							\item \textbf{Loop Detection:} If the robot sees its pebble while chasing, it has surrounded the obstacle.
+							\item \textbf{Surrounding the Boundary:} Triggers a new critical event.
+							\item \textbf{Boundary Association (Fig 12):} Gaps are now linked to specific boundary components (e.g., Gap $g_2$ starts at boundary $q$).
+						\end{itemize}
+				\end{column}
+			\begin{column}{0.4\textwidth}
+					\begin{center}		    	\includegraphics[width=\linewidth]{figures/figure12_gaps.png}\\
+					\vspace{\baselineskip}
+					\scriptsize{Fig. 12. Start and end of a gap. From the robot’s perspective, the boundary components can be related to the beginning and end of a depth discontinuity.}
+						\end{center}
+				\end{column}
+		\end{columns}
+\end{frame}
+
+% --- Slide: VI.B Constructing the Multiply Connected GNT ---
+\begin{frame}{Section VI.B: Constructing the GNT for MCE}
+	\begin{columns}[T]
+		\begin{column}{0.65\textwidth}
+			The GNT now includes a third vertex type to manage unknown pillars: \textbf{Block Vertex}.\\
+    		\vspace{\baselineskip}
+				\textbf{Theorem 5:} In the GNT for multiply connected environments \textbf{chase}($l$) and \textbf{chase}($o$) lead to motions locally optimal in distance to $l$ or $o$, between any possible pair of positions in $R$.\\
+    			\vspace{\baselineskip}
+				\textbf{Block Elimination:}
+				\begin{itemize}
+					\footnotesize
+					\item 13(a-b): The robot moves around a shaded obstacle. Once it completes the loop, it realizes that the "Block Vertex" it had earlier is redundant.
+					\item 13(c-d): It "prunes" the tree, merging the information to ensure it doesn't have two different names for the same region.
+				\end{itemize}
+		\end{column}
+		\begin{column}{0.35\textwidth}
+			\vspace{-0.5cm}
+			\begin{center}
+		    	\includegraphics[width=\linewidth]{figures/figure13_block_elimination.png}\\
+				\footnotesize {Fig. 13: Block vertices elimination.}
+			\end{center}
+		\end{column}
+	\end{columns}
+\end{frame}
+
 \subsection{Implementation}
+
+% --- Slide: VII.A Simulations - The GNT in Action ---
+\begin{frame}{Section VII: Implementation}
+	\begin{columns}[T]
+		\begin{column}{0.55\textwidth}
+			\textbf{Simulation Goals:}
+			\begin{itemize}
+				\item Validate GNT construction in diverse room shapes.
+				\item Demonstrate the transition from exploration to completion.
+				\item Test the handling of "Visual Events" in real-time.
+			\end{itemize}
+			\vspace{\baselineskip}
+			\textbf{GNT Construction:}\\
+			\scriptsize
+			\begin{itemize}
+				\item \textbf{Circles:} Non-primitive (unexplored) gaps.
+				\item \textbf{Squares:} Primitive (explored) leaves.
+				\item \textbf{Color Coding:} Red/Green vertices hide regions to the right/left.
+				\item \textbf{Result:} Evolution from an empty tree to a \textbf{Complete GNT}.
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.45\textwidth}
+    		\vspace{-\baselineskip}
+			\begin{center}
+		    	\includegraphics[width=0.9\linewidth]{figures/figure14_gnt_sim.png}\\
+				\footnotesize {Fig. 14. GNT simulation for a simply connected environment. (a) Initial position. (b), (c) Intermediate moments in the construction. (d) The instant before
+					the last nonprimitive gap disappears.}
+			\end{center}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% --- Slide: Advanced Simulations (Fig 15 & 16) ---
+\begin{frame}{Section VII.A. Simulations}
+	\begin{columns}[T]
+		\begin{column}{0.48\textwidth}
+    		\vspace{-\baselineskip}
+			\begin{center}
+		    	\includegraphics[width=0.8\linewidth]{figures/figure15_object_finding.png}\\
+				\footnotesize {Fig. 15. Object finding simulation for a simply connected environment.}
+			\end{center}
+			\scriptsize
+			\begin{itemize}
+				\item Demonstrates the \textbf{Extended GNT}.
+				\item Robot finds colored squares and delivers them to targets.
+				\item Proves the tree successfully stores locations of hidden objects.
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.48\textwidth}
+    		\vspace{-\baselineskip}
+			\begin{center}
+		    	\includegraphics[width=\linewidth]{figures/figure16_mce_sim.png}\\
+				\footnotesize {Fig. 16. Simulation in a multiply connected environment.}
+			\end{center}
+			\scriptsize
+			\begin{itemize}
+				\item Navigation around a U-shaped pillar ($b_3$).
+				\item Uses \textbf{Block Vertices} ($b_{i,j}$) to represent unsurrounded boundaries.
+				\item Validates the "Pebbles and Pruning" logic from Section VI.
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% --- Slide: VII.B Physical Experiments ---
+\begin{frame}{Section VII.B: Experiments with a Pioneer}
+	\begin{columns}[T]
+		\begin{column}{0.55\textwidth}
+			\textbf{The Real-World Setup:}
+			\begin{itemize}
+				\item \textbf{Hardware:} Pioneer 2-DX with dual laser range finders (360$^\circ$ FOV).
+				\item \textbf{Implementation:} Extracts gaps from "jumps" in laser distance data.
+				\item \textbf{Practical Limitations:}
+				\begin{itemize}
+					\item Sensor noise makes small gaps hard to track.
+					\item Physical robot radius prevents "perfectly" optimal corner-cutting.
+				\end{itemize}
+			\end{itemize}
+    		\vspace{\baselineskip}
+			\scriptsize
+			Real-time laser data: as the robot moves behind a corner, two gaps "collide" and trigger a \textbf{Merge Event} in the tree.
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			\begin{center}
+	    		\includegraphics[width=\linewidth]{figures/figure17_pioneer.png}\\
+				\footnotesize {Fig. 17. Gaps merging. The position of the robot and the corresponding gaps (a) before and (b) after the merge critical event is detected.}
+			\end{center}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+
 \subsection{Conclusions \& Discussion}
+
+% --- Slide: VIII. Conclusion ---
+\begin{frame}{Section VIII: Conclusion}
+	\begin{itemize}
+		\item \textbf{The "Less is More" Philosophy:}
+		Proved that \textbf{Euclidean Optimality} is possible without measuring distances, angles, or coordinates.
+		
+		\item \textbf{The GNT Framework:}
+		\begin{itemize}
+			\item Requires minimal computational power ($O(n)$ space).
+			\item Bridges the gap between simple "Bug Algorithms" and complex "SLAM."
+			\item The ideal gap sensor is hard to replicate due to noise.
+			\item When a critical event is not detected complete branches may be lost, or the robot may chase the "wrong" gaps to reach a goal.
+		\end{itemize}
+		
+		\item \textbf{Future Directions:}
+		\begin{itemize}
+			\item Expanding GNT for \textbf{Pursuit-Evasion} tasks.
+			\item Handling extremely noisy or "subideal" hardware.
+		\end{itemize}
+	\end{itemize}
+	\vfill
+	\begin{block}{Final Takeaway}
+		Navigation is an \textit{information} problem, not just a \textit{geometric} one. By tracking visual events, robots can navigate complex worlds with high efficiency.
+	\end{block}
+\end{frame}
 
 \section{References}
 

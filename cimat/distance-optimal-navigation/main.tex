@@ -168,7 +168,7 @@
 \end{frame}
 
 % --- Slide: The Gap Sensor (Logic) ---
-\begin{frame}{3A. The Gap Sensor}
+\begin{frame}{III.A. The Gap Sensor}
     \begin{itemize}
         \item \textbf{The Core Function:} Detects "breaks" in the boundary $\partial R$ where depth is discontinuous.
         \item \textbf{Identity Tracking:} The robot maintains a unique label for each gap $g_i$ as long as it remains visible.
@@ -215,7 +215,7 @@
 \end{frame}
 
 % --- Slide: Motion Primitives ---
-\begin{frame}{3B. Motion Primitives}
+\begin{frame}{III.B. Motion Primitives}
     \begin{itemize}
         \item {The robot motions are expressed as a sequence of \textbf{motion primitives}, which are described solely in terms of information from the sensor.}
         \item {A gap chasing motion primitive is denoted as chase(g)}
@@ -249,27 +249,40 @@
 
 \subsection{Gap Navigation Tree}
 
-% --- Slide: The Three Notations of Chase ---
-%\begin{frame}{Defining the "Chase" Actions}
-%    The paper uses three specific notations to describe movement:
-%    \vspace{0.4cm}
-%    \begin{itemize}
-%        \item $\text{chase}(g)$: A \textit{single} motion primitive targeting a visible gap $g$.
-%        \item \textbf{$\mathbf{chase}(g)$ (Bold):} A \textit{sequence} of primitives. Used to reach a gap $g$ hidden deep in the tree by chasing its ancestors first.
-%        \item $\text{chase}(\cdot)$: Refers to the \textit{abstract concept} or class of motion primitives regardless of the specific gap.
-%    \end{itemize}
-%\end{frame}
+% --- Mini-Glossary for Section IV ---
+\begin{frame}{Mini-Glossary: GNT Formalism}
+	\begin{description}[labelwidth=-0.8cm]
+		\item[\descmath{s \in [0, 1]}] Normalizes the path $\tau(s)$ from start to end.
+		\item [\descmath{G(\tau(s))}] Denotes the cyclic sequence of all currently visible gaps detected by the gap sensor when the robot is at configuration $\tau(s)$
+	\end{description}
+\end{frame}
+
+\begin{frame}{Section IV: Gap Navigation Tree}
+	\begin{itemize}
+		\item Suppose that the robot moves along any path $\tau : [0,1] \to R$. Consider the information obtained from the gap sensor.
+		\item For every $s \in [0,1]$, a cyclic sequence $G(\tau(s))$ of gaps is observed.
+		\item Here, we define a compact representation of information that is relevant for optimal navigation and appears in $G(\tau(s))$ for all $s \in [0,1]$.
+	\end{itemize}
+	\begin{center}
+		\includegraphics[width=\linewidth]{figures/figure4_5_gnt.png}
+		\cite{nasirGNT}
+	\end{center}
+\end{frame}
 
 % --- Slide: IV.A Compressing Sensor History ---
-\begin{frame}{Section IV.A: GNT Structure \& Vertices}
+\begin{frame}{IV.A: Compressing Sensor History}
     \begin{itemize}
-        \item \textbf{Rooted Tree:} Compresses the history of $G(\tau(s))$. The root is the robot's current position.
+	\item \textbf{Rooted Tree:} Compresses the history of $G(\tau(s))$. The root is the robot’s current position.
+	\begin{itemize}
+		\item Each nonroot vertex is a gap appearing in $G(\tau(s))$ for some $s \in [0,1]$.
+		\item Children of the root are exactly the gaps in $G(\tau(1))$, cyclically ordered as in $G(\tau(1))$.
+		\item All other vertices are gaps that appeared for some $s<1$ but not in $G(\tau(1))$ due to merging.
+	\end{itemize}
         \item \textbf{Vertex Classification:}
         \begin{itemize}
             \item \textbf{Primitive:} A leaf that disappears when chased (no hidden regions).
             \item \textbf{Non-Primitive:} A leaf that splits when chased (hides other gaps).
         \end{itemize}
-        \item \textbf{Complete GNT:} 
         \begin{block}{}
             A GNT is \textbf{Complete} if and only if all of its leaf vertices are \textbf{primitive}.
         \end{block}
@@ -277,62 +290,104 @@
     \end{itemize}
 \end{frame}
 
-% --- Mini-Glossary for Section IV ---
-\begin{frame}{Mini-Glossary: GNT Formalism}
+% --- Slide: The Three Notations of Chase ---
+\begin{frame}{Defining the "Chase" Actions}
+    The paper uses three specific notations to describe movement:
+    \vspace{0.4cm}
+    \begin{itemize}
+	        \item $\text{chase}(g)$: A \textit{single} motion primitive targeting a visible gap $g$.
+	        \item \textbf{$\mathbf{chase}(g)$ (Bold):} A \textit{sequence} of primitives. Used to reach a gap $g$ hidden deep in the tree by chasing its ancestors first.
+	        \item $\text{chase}(\cdot)$: Refers to the \textit{abstract concept} or class of motion primitives regardless of the specific gap.
+	    \end{itemize}
+\end{frame}
+
+% --- Slide: IV.B & C Critical Events & Geometry ---
+\begin{frame}{IV.B. Critical Events and GNT Construction}
+	\begin{columns}[T]
+		\begin{column}{0.4\textwidth}	
+			\begin{itemize}
+				\small
+				\item Each time $t$ at which a change in $G(\tau(t))$ occurs corresponds to a \textbf{critical event}. 
+				\item This requires updating the GNT.
+				\item There are four different kinds of critical events.
+				\end{itemize}
+	    \begin{enumerate}
+	    	\small
+	        \item \textbf{Appearance:} New gap $g$ added to root.
+	        \item \textbf{Merge:} $g_1, g_2$ become children of a new vertex.
+	        \item \textbf{Disappearance:} Primitive leaf is removed.
+	        \item \textbf{Split:} Non-primitive vertex divides.
+	    \end{enumerate}
+		\end{column}
+		\begin{column}{0.6\textwidth}	
+			\center
+	    	\includegraphics[width=0.8\linewidth]{figures/figure5_updates.png}\\
+		    \scriptsize{Fig. 5. Updates in the GNT. The relevant inflection or bitangent complement is indicated with a gray line segment.}
+	    \end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Mini-Glossary: Geometry behind GNT}
+	\begin{block}{}
+		Critical events are determined by \textbf{generalized inflections} and \textbf{generalized bitangents} of the environment boundary ($\partial R$).
+	\end{block}
+% 	\vspace{\baselineskip}
 	\begin{description}[labelwidth=-0.8cm]
-		\item[\descmath{s \in [0, 1]}] Normalizes the path $\tau(s)$ from start to end.
-		\item[\descmath{I, J}] Connected segments of the boundary $\partial R$.
-		\item[\descmath{L}] A line that partitions space or acts as a tangent.
-		\item[{Gen. Inflection}] Where boundary $I$ crosses its tangent line $L$.
-		\item[{Gen. Bitangent}] A line $L$ tangent to two disjoint segments $I$ and $J$.
+		\item[\descmath{L}] (The Partitioning Line) A straight line that divides the local space into two half-planes. In the GNT model, $L$ represents the "critical threshold" or "sight-line."
+		\item[\descmath{I}] (Primary Boundary Segment) A connected, open piece of the wall ($\partial R$). It is used to define both inflections and bitangents.
+		\item[\descmath{J}] (Secondary Boundary Segment): A separate, disjoint piece of the wall ($\partial R$). It is used specifically to define bitangents Connected segments of the boundary.
+		\item[{Inflection}] Trigger for Appearance and Disappearance of Gaps.
+		\item[{Bitangent}] Trigger for Merging and Splitting of Gaps.
 	\end{description}
 \end{frame}
 
-
-% --- Slide: IV.B & C Critical Events & Geometry ---
-\begin{frame}{IV.B \& C: Critical Events \& Geometric Triggers}
+\begin{frame}{IV.C. Geometric Interpretation of the GNT}
+	\vspace{-\baselineskip}
     \begin{columns}[T]
-        \begin{column}{0.6\textwidth}
-            \small
-            \textbf{The Four Events (Fig 5):}
-            \begin{enumerate}
-                \item \textbf{Appearance:} New gap $g$ added to root.
-                \item \textbf{Merge:} $g_1, g_2$ become children of a new vertex.
-                \item \textbf{Disappearance:} Primitive leaf is removed.
-                \item \textbf{Split:} Non-primitive vertex divides.
-            \end{enumerate}
-            \vspace{0.2cm}
-            \textbf{Geometric Relations (Fig 6):}
-            \begin{itemize}
-                \item \textbf{Inflections:} Line $L$ partitions $I$ into $I_1, I_2$. Triggers Appearance/Disappearance.
-                \item \textbf{Bitangents:} Line $L$ is tangent to disjoint $I$ and $J$. Triggers Merge/Split.
-            \end{itemize}
-        \end{column}
-        \begin{column}{0.4\textwidth}
-            \begin{center}
-                \textit{[Insert Figure 5 \& 6]}
-            \end{center}
-            \footnotesize
-            \textbf{Lemma 1:} Merged gaps $g_1, g_2$ always reappear at the same angle when their parent splits.
-        \end{column}
-    \end{columns}
+		\begin{column}{0.45\textwidth}	
+			\vspace{0.2cm}
+			\begin{itemize}
+				\item \textbf{Inflections:} A geometric threshold where a boundary segment ($I$) crosses its own tangent line ($L$) marking the exact moment a gap appears or disappears from the robot's view.
+				\item \textbf{Bitangents:} A "bridge" where a single line ($L$) is tangent to two separate boundary segments ($I$) and ($J$), causing two gaps to merge into one or one gap to split into two.
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.55\textwidth}
+			\begin{center}
+		    	\includegraphics[width=\linewidth]{figures/figure6_critical_events.png}\\
+		    	\scriptsize{Fig. 6. Critical events. (a) Appearance and disappearance of gaps occur when the robot crosses inflection rays. (b) Splits and merge occur by crossing bitangent complements.}\\
+	    		\vspace{\baselineskip}
+	    		\normalsize
+		    	\textbf{Lemma 1:} Let $g1$ and $g2$ be two gaps that merge into gap $g3$. When $g3$ splits, $g1$ and $g2$ appear at the same angular position in $R$ at the time of the merge, independently from the robot’s motion.		    	
+			\end{center}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 % --- Slide: IV.D The Gap-Based Roadmap ---
 \begin{frame}{Section IV.D: The Gap-Based Roadmap ($S$)}
-    \begin{itemize}
-        \item \textbf{Definition:} $S$ is the set of all points reached by executing a sequence of $\text{chase}(\cdot)$ primitives following critical events.
-        \item \textbf{Function:} It serves as a topological "skeleton" of the environment.
-        \item \textbf{Termination (Lemma 2):} Every $\text{chase}(g)$ is guaranteed to terminate because the robot must eventually cross an inflection or bitangent.
-    \end{itemize}
-    \vfill
-    \begin{center}
-        \textit{$S$ contains all information needed for distance-optimal navigation.}
-    \end{center}
+	\vspace{-\baselineskip}
+	\begin{columns}[T]
+		\begin{column}{0.6\textwidth}
+			\begin{center}
+				\includegraphics[width=\linewidth]{figures/figure7_chase_termination.png}\\
+				\scriptsize{Fig. 7. Every chase($\cdot$) motion primitive terminates, either with a disappearance or with a split critical event. The black disc represents the position of the robot when the chase($\cdot$) motion primitive is issued. After reaching $\partial R$, the robot moves tangentially to $\partial R$, until (a) an inflection ray or (b) a bitangent complement is crossed.}\\
+			\end{center}
+		\end{column}		
+		\begin{column}{0.4\textwidth}	
+			\vspace{0.2cm}
+		    \begin{itemize}
+		        \item \textbf{Definition:} $S$ is the set of all points reached by executing a sequence of $\text{chase}(\cdot)$ primitives following critical events.
+		        \item \textbf{Termination:} Every $\text{chase}(g)$ is guaranteed to terminate because the robot must eventually cross an inflection or bitangent.
+		    \end{itemize}
+    	\end{column}
+	\end{columns}
+	\vspace{\baselineskip}
+	\normalsize
+	\textbf{Lemma 2:}  Termination of chase $(g)$ is guaranteed for any $g \in G(x)$ and any $x \in R$ and is caused by only two possible critical	events: disappearance or splitting of $g$.
 \end{frame}
 
 % --- Slide: IV.E Constructing a Complete GNT ---
-\begin{frame}{Section IV.E: Exploration Strategy}
+\begin{frame}{Section IV.E: Constructing a Complete GNT}
     \begin{columns}[T]
         \begin{column}{0.6\textwidth}
             \textbf{The Algorithm:}
@@ -343,13 +398,14 @@
                 \item Repeat until all leaves are primitive.
             \end{enumerate}
             \vspace{0.3cm}
-            \textbf{Lemma 3:} 
-            This process is guaranteed to finish because $\partial R$ has a finite number of inflection and bitangent triggers.
+            \textbf{Lemma 3:} The procedure of iteratively chasing nonprimitive leaves terminates with a resulting complete GNT.\\
+           	\vspace{\baselineskip}
+ 			\scriptsize{Fig. 8. Building the GNT. (a) The thin lines show the places where gap critical events are triggered. The robot chases nonprimitive gaps from (a) to (f), updating the GNT accordingly (refer to the text), until all of the leaf vertices are primitive. Squares and circles denote primitive and nonprimitive vertices, respectively.}
         \end{column}
-        \begin{column}{0.4\textwidth}
+        \begin{column}{0.35\textwidth}
+       		\vspace{-\baselineskip}
             \begin{center}
-                \textit{[Insert Figure 8]} \\
-                \footnotesize \textbf{Figure 8: Incremental construction of the GNT.}
+				\includegraphics[width=0.9\linewidth]{figures/figure8_GNT.png}\\
             \end{center}
         \end{column}
     \end{columns}
@@ -357,10 +413,90 @@
 
 \subsection{Optimal Navigation}
 
+% --- Mini-Glossary for Section V ---
+\begin{frame}{Mini-Glossary: V. Optimal Navigation}
+	\textbf{Crucial Assumption:} The exploration phase is complete. The robot now possesses a 'Complete GNT'*.
+	\vspace{\baselineskip}
+	\begin{description}[labelwidth=-0.8cm]
+		\item[$p, q$] Points in the environment $R$ (Start and Goal).
+		\item[$n$] The number of \textbf{inflections} (geometric complexity of the room).
+		\item[$u_i$] A specific segment of the boundary $\partial R$ associated with a gap.
+		\item[\descmath{U = (u_1, \dots, u_n)}] Sequence of maximal connected intervals of the boundary $\partial R$ that the robot traverses (in order) in the shortest path from $p$ to $q$.
+      \item[$L, O$] \textbf{Landmarks} (fixed) and \textbf{Objects} (movable) in the tree.
+	\end{description}	
+	\vspace{\baselineskip}
+	\footnotesize *Note: In simple connected rooms, completeness is guaranteed. The specific 'issues' that arise in rooms with pillars—and how to solve them—will be revealed in Section VI.
+\end{frame}
+
+% --- Slide: V.A Moving Along the Roadmap ---
+\begin{frame}{Section V.A: Moving Along the Roadmap}
+	\begin{itemize}
+		\item \textbf{Lemma 4:} Let $H=(g_1, g_2, ..., g_n)$ be a sequence of gaps, in
+			which $g_i$ is the gap chased when the robot traverses the interval $u_i \in U$. The path generated by chasing iteratively the sequence $H$ is the shortest path between $p$ and $q$.
+		\item \textbf{Theorem 1:} If $R$ is simply connected and the robot is at a point in $S$, then the path encoded in the GNT between the root and any point $q \in S$ is \textbf{globally optimal} in Euclidean distance.
+		\item \textbf{The "Taut String" Logic:} 
+		\begin{itemize}
+			\item The shortest path is a sequence of straight lines.
+			\item These lines are tangent to $\partial R$ at specific intervals $u_i$.
+			\item Chasing the gap sequence $H = (g_1, \dots, g_n)$ physically forces the robot to follow these tangent points.
+		\end{itemize}
+	\end{itemize}
+	\begin{center}
+		\textit{The robot follows the "taut string" without ever measuring its length.}
+	\end{center}
+\end{frame}
+
+
+%		\item[$L, O$] \textbf{Landmarks} (fixed) and \textbf{Objects} (movable) in the tree.
+
+% --- Slide: V.B Complexity ---
+\begin{frame}{Section V.B: Complexity}
+	\begin{description}
+		\item[$O(n)$] \textbf{(Big-O Notation):} Represents linear asymptotic complexity.
+	\end{description}
+	 It means the resources (memory or time) needed by the robot grow in direct proportion to the complexity of the room.
+	\vspace{0.4cm}
+	\begin{itemize}
+		\item \textbf{Space Complexity $O(n)$:} The GNT requires memory proportional to the number of inflections, not the size of the room.
+		\item \textbf{Construction Complexity:} The construction of the GNT cannot take more than $O(n)$ gap-chasing motion commands.
+		\item \textbf{Query Complexity:} A query for \textbf{chase$(\cdot)$} takes in the worst case $O(n)$ time.
+	\end{itemize}
+	\vfill
+	\begin{block}{Efficiency Note}
+		This allows the robot to operate in large environments with very limited computational power.
+	\end{block}
+\end{frame}
+
+% --- Slide: V.C Traveling Anywhere ---
+\begin{frame}{Section V.C Traveling Anywhere in $R$}
+	\begin{columns}[T]
+		\begin{column}{0.6\textwidth}
+			\textbf{Moving to Targets:}
+			\begin{itemize}
+				\item \textbf{$\text{chase}(l)$:} Optimal sequence of moves to reach a landmark.
+				\item \textbf{$\text{chase}(o)$:} Optimal moves to reach a specific object.
+			\end{itemize}
+			\vspace{0.3cm}
+			\textbf{Theorem 2:} The extended GNT encodes a path to any object or landmark in the environment from the current position of the robot.\\
+			\textbf{Corollary 1:} 
+			The motions $\textbf{chase}(l)$ and $\textbf	{chase}(o)$ lead to distance-optimal paths between \textit{any} possible pair of positions in $R$.
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			\footnotesize
+			A fifth critical event is included, which corresponds to the appearance of an object or landmark in $G(x)$.
+			\begin{center}
+            \includegraphics[width=\linewidth]{figures/figure9_objects.png}
+			\scriptsize{Fig. 9. Encoding objects in the GNT. When the triangular object hides behind the gap, we associate such an object with the gap. The gap encodes the last time the object was visible (the object is hidden behind the gap).}
+			\end{center}
+		\end{column}
+	\end{columns}
+	\vspace{\baselineskip}
+	\scriptsize
+	When an object is hidden behind a gap, it is stored as a child of that gap in the tree. To find it, the robot simply "unfolds" the tree.
+\end{frame}
+
 \subsection{Multiply Connected Environments}
-
 \subsection{Implementation}
-
 \subsection{Conclusions \& Discussion}
 
 \section{References}

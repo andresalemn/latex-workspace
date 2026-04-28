@@ -1,13 +1,19 @@
 \documentclass{article}
 
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
 \usepackage{fancyhdr}
 \usepackage{extramarks}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{tikz}
-\usepackage[plain]{algorithm}
+\usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{natbib}
 
 \usetikzlibrary{automata,positioning}
 
@@ -50,21 +56,21 @@
 %
 
 \newcommand{\enterProblemHeader}[2]{
-	\nobreak\extramarks{}{Problem \arabic{#1}: #2\ continued on next page\ldots}\nobreak{}
-	\nobreak\extramarks{Problem \arabic{#1}: #2\ (continued)}{Problem \arabic{#1}: #2\ continued on next page\ldots}\nobreak{}
+	\nobreak\extramarks{}{Problema {#1} continúa en la sig pág\ldots}\nobreak{}
+	\nobreak\extramarks{Problema \arabic{#1} (continúa)}{Problema \arabic{#1} continúa en la sig pág\ldots}\nobreak{}
 }
 
 \newcommand{\exitProblemHeader}[2]{
-	\nobreak\extramarks{Problem \arabic{#1}: #2\ (continued)}{Problem \arabic{#1}: #2\ continued on next page\ldots}\nobreak{}
+	\nobreak\extramarks{Problema \arabic{#1}}{Problema \arabic{#1} continúa en la sig pág\ldots}\nobreak{}
 	\stepcounter{#1}
-	\nobreak\extramarks{Problem \arabic{#1}}{}\nobreak{}
+	\nobreak\extramarks{Problema \arabic{#1}}{}\nobreak{}
 }
 
 \setcounter{secnumdepth}{0}
 \newcounter{partCounter}
 \newcounter{homeworkProblemCounter}
 \setcounter{homeworkProblemCounter}{1}
-\nobreak\extramarks{Problem \arabic{homeworkProblemCounter}}{}\nobreak{}
+\nobreak\extramarks{Problema \arabic{homeworkProblemCounter}}{}\nobreak{}
 
 %
 % Homework Problem Environment
@@ -116,7 +122,7 @@
 \author{\hmwkAuthorName}
 \date{}
 
-\renewcommand{\part}[1]{\textbf{\large Part \Alph{partCounter}}\stepcounter{partCounter}\\}
+\renewcommand{\part}[1]{\textbf{\large Parte \Alph{partCounter}}\stepcounter{partCounter}\\}
 
 %
 % Various Helper Commands
@@ -135,7 +141,7 @@
 \newcommand{\dx}{\mathrm{d}x}
 
 % Alias for the Solution section header
-\newcommand{\solution}{\textbf{\large Solution}}
+\newcommand{\solution}{\textbf{\large Solución}}
 
 % Probability commands: Expectation, Variance, Covariance, Bias
 \newcommand{\E}{\mathrm{E}}
@@ -150,10 +156,61 @@
 %	\pagebreak
 	
 	\begin{homeworkProblem}{Determinar si Tangent Bug es completo o no}
-	
-	Es completo.
+		
+		Antes de determinar la completitud, se define el algoritmo de acuerdo a \citet{choset2005principles}, quienes describen Tangent Bug como:
+					
+			\begin{algorithm}
+				\caption{Tangent Bug Algorithm}
+				\textbf{Input:} A point robot with a range sensor \\
+				\textbf{Output:} A path to $q_{goal}$ or a conclusion no such path exists
+				\hrule
+				
+				\begin{algorithmic}[1]
+					\While{True}
+					\Repeat
+					\State Continuously move toward the point $n \in \{T, O_i\}$ which minimizes 
+					$d(x,n) + d(n,q_{goal})$
+					\Until{the goal is encountered \textbf{or} the direction that minimizes $d(x,n) + d(n,q_{goal})$ 
+						begins to increase $d(x,q_{goal})$ (i.e., a local minimum of $d(\cdot, q_{goal})$ is detected)}
+					
+					\State Choose a boundary-following direction which continues in the same direction as the most recent motion-to-goal direction
+					
+					\Repeat
+					\State Continuously update $d_{reach}$, $d_{followed}$, and $\{O_i\}$
+					\State Continuously move toward $n \in \{O_i\}$ that is in the chosen boundary direction
+					\Until{
+						the goal is reached \textbf{or} 
+						the robot completes a cycle around the obstacle (goal not achievable) \textbf{or} 
+						$d_{reach} < d_{followed}$
+					}
+					\EndWhile
+				\end{algorithmic}
+			\end{algorithm}
+		
+		En donde:
+		
+		\begin{itemize}
+			\item $x \in \mathbb{R}^2$: posición actual del robot en el espacio de trabajo.
+			
+			\item $q_{goal} \in \mathbb{R}^2$: configuración objetivo que el robot debe alcanzar.
+			
+			\item $d(a, b) = \|a - b\|$: distancia euclidiana entre dos puntos $a$ y $b$ en el espacio de trabajo.
+			
+			\item $O_i$: punto de discontinuidad en el rango del sensor asociado al $i$-ésimo obstáculo, correspondiente a los extremos (esquinas) detectados por el robot.
+			
+			\item $T$: conjunto de puntos tangentes visibles desde la posición actual $x$, definidos como los puntos $O_i$ desde los cuales la línea de visión al robot es tangente al obstáculo correspondiente.
+			
+			\item $n \in \{T \cup \{O_i\}\}$: punto candidato hacia el cual el robot evalúa moverse; puede ser un punto tangente o un punto de discontinuidad visible.
+			
+			\item $d(x, n) + d(n, q_{goal})$: función de costo que estima la distancia total del camino pasando por el punto candidato $n$; el robot se mueve hacia el $n$ que minimiza esta expresión.
+			
+			\item $d_{followed}$: distancia euclidiana $d(x, q_{goal})$ registrada en el momento en que el robot inicia la fase de seguimiento de frontera (\textit{boundary-following}). Sirve como referencia para evaluar el progreso.
+			
+			\item $d_{reach}$: menor valor de $d(n, q_{goal})$ observado sobre todos los puntos tangentes $n \in T$ durante la fase de seguimiento de frontera. Representa la distancia mínima a la meta que el robot podría alcanzar desde su trayectoria actual.
+		\end{itemize}
 		
 	\end{homeworkProblem}
 	
-	
+	\bibliographystyle{plainnat}
+	\bibliography{biblio}
 \end{document}

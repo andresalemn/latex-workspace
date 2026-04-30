@@ -209,6 +209,20 @@
 			\item $d_{reach}$: menor valor de $d(n, q_{goal})$ observado sobre todos los puntos tangentes $n \in T$ durante la fase de seguimiento de frontera. Representa la distancia mínima a la meta que el robot podría alcanzar desde su trayectoria actual.
 		\end{itemize}
 		
+		Se dice que \textit{Tangent Bug} es completo si, para cualquier configuración 
+		inicial $x$ y objetivo $q_{goal}$, el algoritmo termina en tiempo finito 
+		garantizando uno de los siguientes casos:
+		
+		\begin{itemize}
+			\item El robot alcanza $q_{goal}$.
+			\item El robot determina que $q_{goal}$ es inalcanzable.
+		\end{itemize}
+		
+		Esto se garantiza por las condiciones de terminación de la fase de 
+		\textit{boundary-following}: si $d_{reach} < d_{followed}$, el robot 
+		progresa hacia la meta; de lo contrario, al completar un ciclo alrededor 
+		del obstáculo sin mejora, el algoritmo concluye que no existe camino libre.
+		
 	\end{homeworkProblem}
 	
 	\bibliographystyle{plainnat}

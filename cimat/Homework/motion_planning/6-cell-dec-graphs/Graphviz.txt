@@ -1,0 +1,36 @@
+Graphviz
+
+graph Caso1 {
+    rankdir=LR;
+    node [shape=ellipse, style=filled, fillcolor=lightblue, fontname="Arial"];
+    label="Caso 1: L < ℓ (Conectado)";
+
+    // Celdas: (Región, Stop Horario, Stop Antihorario)
+    C1 [label="(R1, W1, W1)"];
+    C0 [label="(R0, Ω, Ω)"];
+    C2 [label="(R2, W2, W2)"];
+
+    // Adyacencias por solapamiento de intervalos angulares
+    C1 -- C0;
+    C0 -- C2;
+}
+
+graph Caso2 {
+    node [shape=ellipse, style=filled, fillcolor=tomato, fontname="Arial"];
+    label="Caso 2: L > 2ℓ (Disjunto)";
+
+    // Dos celdas para la misma región física R0
+    C_der [label="(R0, W1, W2)"];
+    C_izq [label="(R0, W2, W1)"];
+
+    // No hay conexión: la barra no puede "dar la vuelta"
+}
+
+
+graph Caso3 {
+    node [shape=ellipse, style=filled, fillcolor=wheat, fontname="Arial"];
+    label="Caso 3: ℓ < L < 2ℓ (Disjunto)";
+
+    C_der [label="(R0, W1, W2)"];
+    C_izq [label="(R0, W2, W1)"];
+}
